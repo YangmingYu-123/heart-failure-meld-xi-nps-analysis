@@ -1,0 +1,11 @@
+{
+  "seed": 20260915,
+  "B": 1000,
+  "n": 1736,
+  "events": 709,
+  "failures": [],
+  "bootstrap_method": "resample patients; refit each model in bootstrap; evaluate in bootstrap and original cohort; apparent minus average difference",
+  "interval_method": "percentiles of apparent bootstrap-resample metric; not CIs for corrected performance",
+  "NRI": "category-free; exploratory, no established decision threshold",
+  "CV": "10 repeats of stratified 10-fold CV. Participant predictions averaged over repeats; individual-repeat metrics provided separately."
+}
