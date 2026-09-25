@@ -1,0 +1,12 @@
+# Private inputs and generated results must never enter the public repository.
+results/
+private_input/
+*.tsv
+*.xls
+*.xlsx
+*.pkl
+*.pickle
+*predictions*.csv
+__pycache__/
+.mypy_cache/
+.pytest_cache/
