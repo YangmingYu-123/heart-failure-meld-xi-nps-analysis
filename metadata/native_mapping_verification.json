@@ -1,0 +1,272 @@
+{
+  "native_sha256": "f2be23eeaf2e6f457512ad7653f6ce98a87ac23376596eef6d3bf46e4f311ae8",
+  "native_rows": 2008,
+  "fields_verified": 44,
+  "all_match_atol_1e-7": true,
+  "comparisons": [
+    {
+      "field": "ID",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "PULSE",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "SBP",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "DBP",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "BMI",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 4.8800004037730105e-09
+    },
+    {
+      "field": "LVEF",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "TBIL",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "CREAT",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "ALB",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "TC",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "NEUT_C",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "LYM",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "MONO_C",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "BNP",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "NA",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "HB",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "EGFR",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "DIABETES",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "COPD",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "CKD",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "LIVER_DZ",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "CCI",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "MI",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "CVD",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "PVD",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "VISIT_N",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "DEATH28",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "READM28",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "DEATH3M",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "READM3M",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "DEATH6M",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "READM6M",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "DEATHTM",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "READMTM",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "AGECAT",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "GENDER",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "NYHA",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "HFTYPE",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "HOSPOUT",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "COMP28",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "COMP3M",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "COMP6M",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    },
+    {
+      "field": "MELD_XI",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 5.684341886080802e-14
+    },
+    {
+      "field": "NPS",
+      "missing_mask_equal": true,
+      "mismatch_n_atol_1e-7": 0,
+      "max_abs_difference": 0.0
+    }
+  ]
+}
