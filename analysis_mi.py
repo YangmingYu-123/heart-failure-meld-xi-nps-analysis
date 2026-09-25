@@ -4,8 +4,8 @@ Outcome indicators in imputation for association only, never used in CV/validati
 """
 from pathlib import Path
 import sys, os, json, warnings, time
+from paths import output_dir
 ROOT=Path(__file__).resolve().parent
-sys.path.insert(0,str(ROOT/'python_packages'))
 os.environ['OMP_NUM_THREADS']='1'
 import numpy as np,pandas as pd
 import statsmodels.api as sm
@@ -15,7 +15,7 @@ from threadpoolctl import threadpool_limits
 from analysis_cc import load_clean,recalculate,model_design,csv
 threadpool_limits(limits=1)
 warnings.filterwarnings('ignore',category=FutureWarning)
-OUT=ROOT/'analysis_mi';OUT.mkdir(exist_ok=True)
+OUT=output_dir('analysis_mi')
 raw,d,log=load_clean()
 B=20;BURN=15
 rawcols=['TBIL','CREAT','ALB','TC','NEUT_C','LYM','MONO_C','SBP','PULSE','BNP','NA']
@@ -32,8 +32,10 @@ assert imp[['AGECAT','male','NYHA_III','NYHA_IV','DIABETES','COPD','DEATH6M','RE
 records=[];trace=[];diagnostics=[];snapshots=[]
 pvals=[];mi_preds=[];covs={}
 for chain in range(B):
-    np.random.seed(20260915+chain)
-    mi=MICEData(imp.copy(),perturbation_method='gaussian',k_pmm=5)
+    # statsmodels 0.15 uses its own Generator: np.random.seed alone does not
+    # seed MICEData when rng is omitted. Pass a dedicated seeded Generator.
+    seed=20260915+chain
+    mi=MICEData(imp.copy(),perturbation_method='gaussian',k_pmm=5,rng=np.random.default_rng(seed))
     for it in range(BURN):
         mi.update_all()
         for col in rawcols:
@@ -89,7 +91,7 @@ for (analysis,model,term),g in records.groupby(['analysis','model','term'],sort=
     crit=stats.t.ppf(.975,df)
     pooled.append({'analysis':analysis,'model':model,'term':term,'m':B,'n':int(g.n.iloc[0]),'events':int(g.events.iloc[0]),'beta':q,'SE':se,'effect_ratio':np.exp(q),'CI_lower':np.exp(q-crit*se),'CI_upper':np.exp(q+crit*se),'p':2*stats.t.sf(abs(q/se),df),'df_Barnard_Rubin':df,'fraction_missing_variance':lam,'MCSE_beta':np.sqrt(b/B),'within_variance':u,'between_variance':b,'ratio_type':'RR' if analysis=='modified_Poisson' else 'OR'})
 p=pd.DataFrame(pooled);csv(p,OUT/'MI_pooled_associations.csv')
-note={'cohort_n':2008,'events':830,'method':'MICEData chained equations with Gaussian coefficient perturbation and predictive mean matching, 5 donors','datasets':B,'independent_seeds':list(range(20260915,20260915+B)),'burnin_sweeps_per_chain':BURN,'variables':list(imp.columns),'log_transformed_before_PMM':logcols,'score_treatment':'passive recalculation from imputed components, observed data held exact','pool':'Rubin with Barnard-Rubin degrees of freedom; normal coefficient MI, no model performance pooling','intended_use':'association only; outcomes included in imputation; must not report predictions from these imputations as external or cross-validated performance','observed_derived_score_consistency':'scores recalc checked in analysis_cc','versions':{'numpy':np.__version__,'pandas':pd.__version__,'statsmodels':sm.__version__}}
+note={'cohort_n':2008,'events':830,'method':'MICEData chained equations with Gaussian coefficient perturbation and predictive mean matching, 5 donors','datasets':B,'independent_seeds':list(range(20260915,20260915+B)),'rng_implementation':'Explicit numpy.random.default_rng(seed) passed to MICEData rng parameter; PCG64','historical_seed_correction':'Original script called numpy.random.seed only, which did not seed statsmodels 0.15 MICEData; current output replaces that non-reproducible run.','burnin_sweeps_per_chain':BURN,'variables':list(imp.columns),'log_transformed_before_PMM':logcols,'score_treatment':'passive recalculation from imputed components, observed data held exact','pool':'Rubin with Barnard-Rubin degrees of freedom; normal coefficient MI, no model performance pooling','intended_use':'association only; outcomes included in imputation; must not report predictions from these imputations as external or cross-validated performance','observed_derived_score_consistency':'scores recalc checked in analysis_cc','versions':{'numpy':np.__version__,'pandas':pd.__version__,'statsmodels':sm.__version__}}
 (OUT/'MI_run_settings.json').write_text(json.dumps(note,indent=2),encoding='utf-8')
 print(p[p.term.isin(['MELD_XI_per5','NPS_per1','MELD_x_NPS'])].to_string(index=False))
 

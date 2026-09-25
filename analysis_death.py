@@ -1,14 +1,14 @@
 from pathlib import Path
 import sys,json
+from paths import output_dir
 ROOT=Path(__file__).resolve().parent
-sys.path.insert(0,str(ROOT/'python_packages'))
 import numpy as np,pandas as pd
 from scipy.special import expit
 from scipy.optimize import minimize,brentq
 from scipy.stats import chi2
 from scipy.optimize._numdiff import approx_derivative
 from analysis_cc import load_clean,model_design,csv
-OUT=ROOT/'analysis_death';OUT.mkdir(exist_ok=True)
+OUT=output_dir('analysis_death')
 _,d,_=load_clean()
 d['logBNP']=np.log(d.BNP)
 cols=['AGECAT','GENDER','NYHA','logBNP','MELD_XI_recalc','NPS_recalc']

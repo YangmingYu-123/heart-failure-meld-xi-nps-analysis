@@ -5,9 +5,10 @@ for multiplicity. Uses the shared cleaning and model-design implementation.
 from pathlib import Path
 import os, json
 BASE = Path(__file__).resolve().parent
-os.environ.setdefault('MPLCONFIGDIR', str(BASE/'analysis_cc'/'exploratory'/'mpl_cache'))
 import sys
 sys.path.insert(0,str(BASE))
+from paths import output_dir, output_root
+os.environ.setdefault('MPLCONFIGDIR', str(output_root()/'analysis_cc'/'exploratory'/'mpl_cache'))
 from analysis_cc import load_clean, model_design, csv, jsonify
 import numpy as np
 import pandas as pd
@@ -19,7 +20,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter, NullFormatter
 
-OUT=BASE/'analysis_cc'/'exploratory'
+OUT=output_dir('analysis_cc')/'exploratory'
 OUT.mkdir(exist_ok=True,parents=True)
 plt.rcParams.update({'font.family':'DejaVu Sans','font.size':10,'axes.titlesize':11,'axes.labelsize':10,'axes.spines.top':False,'axes.spines.right':False,'pdf.fonttype':42,'ps.fonttype':42,'savefig.facecolor':'white'})
 raw,d,cleanlog=load_clean()
@@ -58,7 +59,7 @@ def coef(f, term, analysis, comparison='', n=N, events=E, extra=None):
 
 m0=fit(X[basecols]);m3=fit(X)
 # Confirm the imported pipeline reproduces the completed common-case analysis.
-previous=pd.read_csv(BASE/'analysis_cc'/'CC_model_performance_apparent.csv')
+previous=pd.read_csv(output_root()/'analysis_cc'/'CC_model_performance_apparent.csv')
 for name,f in [('M0',m0),('M3',m3)]:
     old=previous.query('cohort == "all_records" and model == @name').iloc[0]
     assert int(old.n)==N and int(old.events)==E

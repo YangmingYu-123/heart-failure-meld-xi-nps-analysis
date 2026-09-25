@@ -7,7 +7,7 @@ NRI is exploratory and no clinical decision threshold is inferred from it.
 from pathlib import Path
 import sys,json
 ROOT=Path(__file__).resolve().parent
-sys.path.insert(0,str(ROOT/'python_packages'))
+from paths import output_dir
 import numpy as np
 import pandas as pd
 from scipy.special import expit,logit
@@ -18,7 +18,7 @@ from sklearn.model_selection import StratifiedKFold
 from analysis_cc import load_clean,model_design,csv
 SEED=20260915
 B=1000
-OUT=ROOT/'analysis_cc'/'bootstrap'
+OUT=output_dir('analysis_cc')/'bootstrap'
 
 def fit(X,y,maxiter=50):
     beta=np.zeros(X.shape[1]);beta[0]=logit(np.clip(y.mean(),1e-6,1-1e-6))

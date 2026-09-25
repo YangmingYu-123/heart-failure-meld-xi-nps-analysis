@@ -1,9 +1,9 @@
 from pathlib import Path
 import sys
-sys.path.insert(0,str(Path(r'C:\Users\MSI\.codex\visualizations\2026\09\15\01a0a3e6-ceae-7230-94c6-1c2cebfb90c8')/'python_packages'))
+from paths import output_dir
 import numpy as np,pandas as pd
 from scipy import stats
-root=Path(r'C:\Users\MSI\.codex\visualizations\2026\09\15\01a0a3e6-ceae-7230-94c6-1c2cebfb90c8');out=root/'analysis_mi'
+root=Path(__file__).resolve().parent;out=output_dir('analysis_mi')
 r=pd.read_csv(out/'MI_coefficients_each.csv');B=int(r.chain.nunique());rows=[]
 for (analysis,model,term),g in r.groupby(['analysis','model','term'],sort=False):
  q=g.beta.mean();u=(g.SE**2).mean();b=g.beta.var(ddof=1);t=u+(1+1/B)*b;se=np.sqrt(t);lam=(1+1/B)*b/t

@@ -1,18 +1,16 @@
-"""HFYC_NPS: read-only source QC and common complete-case logistic models.
-Run with bundled Python. Statistical dependencies in sibling python_packages.
-AGECAT is ordinal, not exact age; all available patients retained as main cohort.
+"""HFYC_NPS source QC and common complete-case logistic models.
+
+AGECAT is ordinal, not exact age; all available patients are retained as the
+main cohort.  Input and output locations are configured through ``paths.py``.
 """
 from pathlib import Path
-import sys, argparse, json, hashlib
-pkg=Path(__file__).resolve().parent/'python_packages'
-if pkg.exists(): sys.path.insert(0,str(pkg))
+import sys, os, argparse, json, hashlib
+from paths import data_path, dictionary_path, output_dir
 import numpy as np
 import pandas as pd
 from scipy import stats
 import statsmodels.api as sm
 from sklearn.metrics import roc_auc_score,brier_score_loss
-SOURCE=Path(r'D:\EmpowerStats\Analysis\HFYC_NPS\HFYC_NPS.xls')
-DICT=Path(r'D:\易侕论文\心衰Codex+OpenClaw+心衰队列的首发攻略\HF数据\变量说明文件.xlsx')
 SCORES=['TBIL','CREAT','ALB','TC','NEUT_C','LYM','MONO_C']
 M0_RAW=['AGECAT','GENDER','NYHA','SBP','PULSE','BNP','NA','DIABETES','COPD']
 M0_DESCRIPTION='AGECAT ordinal + male + NYHA III/IV + SBP per 10 + pulse per 10 + ln BNP + Na per 5 + diabetes + COPD'
@@ -34,8 +32,8 @@ def recalculate(d):
     d['NPS_recalc']=d[[s[0] for s in specifications]].sum(axis=1,min_count=4)
     return d
 
-def load_clean(source=SOURCE):
-    raw=pd.read_csv(source,sep='\t',na_values=['NA','']);d=raw.copy();log=[]
+def clean_frame(raw):
+    d=raw.copy();log=[]
     for c in ['TBIL','CREAT','ALB','TC','LYM','MONO_C','SBP','DBP','BMI','BNP','HB','NA','PULSE']:
         bad=d[c].notna()&d[c].le(0)
         for i in d.index[bad]: log.append({'source_row_including_header':int(i+2),'variable':c,'value':d.at[i,c],'action':'set missing','reason':'nonpositive value'})
@@ -45,6 +43,14 @@ def load_clean(source=SOURCE):
         for i in d.index[bad]: log.append({'source_row_including_header':int(i+2),'variable':c,'value':d.at[i,c],'action':'set missing','reason':'negative cell count'})
         d.loc[bad,c]=np.nan
     return raw,recalculate(d),pd.DataFrame(log)
+
+def load_clean(source=None):
+    source = data_path(source)
+    precision=os.environ.get('HFYC_FLOAT_PRECISION') or None
+    if precision not in (None,'high','round_trip'):
+        raise ValueError('HFYC_FLOAT_PRECISION must be high or round_trip when set')
+    raw=pd.read_csv(source,sep='\t',na_values=['NA',''],float_precision=precision)
+    return clean_frame(raw)
 
 def model_design(d,meld='MELD_XI_recalc',age_categorical=False):
     x=pd.DataFrame(index=d.index);x['const']=1.
@@ -83,15 +89,25 @@ def fit_models(d,label,out,agecat=False,meld='MELD_XI_recalc'):
     return pd.DataFrame(metrics),pd.DataFrame(coefs),pd.DataFrame(tests)
 
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument('--data',type=Path,default=SOURCE);ap.add_argument('--out',type=Path,default=Path(__file__).resolve().parent/'analysis_cc');args=ap.parse_args();out=args.out;out.mkdir(exist_ok=True,parents=True)
-    raw,d,log=load_clean(args.data);csv(log,out/'cleaning_log.csv')
-    meta=pd.read_excel(DICT,sheet_name='meta');csv(meta[meta.iloc[:,0].isin(SCORES+M0_RAW+['VISIT_N','COMP6M','DEATH6M','READM6M','HOSPOUT','DEATHTM','READMTM'])],out/'variable_dictionary_used.csv')
+    ap=argparse.ArgumentParser(description='Run source QC and complete-case models.')
+    ap.add_argument('--data',type=Path,default=None,help='Approved tab-delimited coded extract; otherwise HFYC_DATA.')
+    ap.add_argument('--dictionary',type=Path,default=None,help='Optional private dictionary workbook; otherwise use bundled source-field mapping.')
+    ap.add_argument('--out',type=Path,default=None,help='Output root; creates analysis_cc within it; otherwise use HFYC_OUT.')
+    args=ap.parse_args();out=output_dir('analysis_cc',args.out);out.mkdir(exist_ok=True,parents=True)
+    resolved_source=data_path(args.data)
+    raw,d,log=load_clean(resolved_source);csv(log,out/'cleaning_log.csv')
+    if args.dictionary or os.environ.get('HFYC_DICT'):
+        meta=pd.read_excel(dictionary_path(args.dictionary),sheet_name='meta')
+        meta=meta[meta.iloc[:,0].isin(SCORES+M0_RAW+['VISIT_N','COMP6M','DEATH6M','READM6M','HOSPOUT','DEATHTM','READMTM'])]
+    else:
+        meta=pd.read_csv(Path(__file__).resolve().parent/'metadata'/'physionet_variable_mapping.csv')
+    csv(meta,out/'variable_dictionary_used.csv')
     consistency=[]
     for original,recalc in [('NPS','NPS_recalc'),('MELD_XI','MELD_XI_recalc')]:
         both=raw[original].notna()&d[recalc].notna();delta=(raw[original]-d[recalc]).abs()
         consistency.append({'score':original,'original_available':int(raw[original].notna().sum()),'recalculated_available':int(d[recalc].notna().sum()),'paired_n':int(both.sum()),'mismatch_n_tolerance_1e-7':int((both&delta.gt(1e-7)).sum()),'missing_pattern_mismatch':int(raw[original].isna().ne(d[recalc].isna()).sum()),'max_absolute_error':delta[both].max()})
     csv(pd.DataFrame(consistency),out/'score_consistency.csv')
-    audit={'data_path':str(args.data),'sha256':hashlib.sha256(args.data.read_bytes()).hexdigest(),'n_rows':len(raw),'n_columns':raw.shape[1],'missing_ID':int(raw.ID.isna().sum()),'duplicated_ID':int(raw.ID.duplicated().sum()),'fully_duplicated_rows':int(raw.duplicated().sum()),'VISIT_N_counts':raw.VISIT_N.value_counts().to_dict(),'COMP6M_OR_mismatch_n':int(raw.COMP6M.ne((raw.DEATH6M.eq(1)|raw.READM6M.eq(1)).astype(int)).sum()),'death_readmission_overlap_n':int((raw.DEATH6M.eq(1)&raw.READM6M.eq(1)).sum()),'endpoint_counts':raw[['COMP6M','DEATH6M','READM6M','COMP28','COMP3M']].sum().to_dict(),'endpoint_missing':raw[['COMP6M','DEATH6M','READM6M']].isna().sum().to_dict(),'in_hospital_death_n':int(raw.HOSPOUT.eq(2).sum()),'in_hospital_deaths_in_DEATH6M':int((raw.HOSPOUT.eq(2)&raw.DEATH6M.eq(1)).sum()),'M0':M0_DESCRIPTION,'cohort_note':'VISIT_N is prior admission count; ID is unique. All 2008 records are main cohort; VISIT_N=1 is sensitivity, not deduplication.','score_consistency':consistency,'versions':{'Python':sys.version,'pandas':pd.__version__,'numpy':np.__version__,'statsmodels':sm.__version__}}
+    audit={'data_path':str(resolved_source),'sha256':hashlib.sha256(resolved_source.read_bytes()).hexdigest(),'n_rows':len(raw),'n_columns':raw.shape[1],'missing_ID':int(raw.ID.isna().sum()),'duplicated_ID':int(raw.ID.duplicated().sum()),'fully_duplicated_rows':int(raw.duplicated().sum()),'VISIT_N_counts':raw.VISIT_N.value_counts().to_dict(),'COMP6M_OR_mismatch_n':int(raw.COMP6M.ne((raw.DEATH6M.eq(1)|raw.READM6M.eq(1)).astype(int)).sum()),'death_readmission_overlap_n':int((raw.DEATH6M.eq(1)&raw.READM6M.eq(1)).sum()),'endpoint_counts':raw[['COMP6M','DEATH6M','READM6M','COMP28','COMP3M']].sum().to_dict(),'endpoint_missing':raw[['COMP6M','DEATH6M','READM6M']].isna().sum().to_dict(),'in_hospital_death_n':int(raw.HOSPOUT.eq(2).sum()),'in_hospital_deaths_in_DEATH6M':int((raw.HOSPOUT.eq(2)&raw.DEATH6M.eq(1)).sum()),'M0':M0_DESCRIPTION,'cohort_note':'VISIT_N is prior admission count; ID is unique. All 2008 records are main cohort; VISIT_N=1 is sensitivity, not deduplication.','score_consistency':consistency,'versions':{'Python':sys.version,'pandas':pd.__version__,'numpy':np.__version__,'statsmodels':sm.__version__}}
     for c in ['DEATHTM','READMTM']:audit[c]={**summary(d[c]),'over180_n':int(d[c].gt(180).sum())}
     audit['BNP_equal5000_n']=int(d.BNP.eq(5000).sum());audit['MELD_floor9_44_n']=int(d.MELD_XI_recalc.eq(9.44).sum());audit['BMI_over70_n']=int(d.BMI.gt(70).sum())
     (out/'data_audit.json').write_text(json.dumps(jsonify(audit),ensure_ascii=False,indent=2),encoding='utf-8')
