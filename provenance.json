@@ -1,0 +1,54 @@
+{
+  "package_revision": "local-v5-native-reproducible-candidate",
+  "created": "2026-09-22",
+  "input": {
+    "filename": "HFYC_NPS.xls",
+    "format": "tab-delimited text despite .xls extension",
+    "rows": 2008,
+    "columns_in_local_extract": 226,
+    "sha256": "b2572d59d7d6d5a19c307c0c33477e0456c5675f972f2dad627d874947d80f1e",
+    "repository_reference": "https://doi.org/10.13026/8a9e-w734",
+    "repository_version_checked": "1.2",
+    "access": "PhysioNet registration and signed data-use agreement required",
+    "raw_input_in_package": false
+  },
+  "privacy": {
+    "participant_level_data_included": false,
+    "imputed_records_included": false,
+    "individual_predictions_included": false,
+    "identifiers_included": false
+  },
+  "provenance_limitations": [
+    "Historical 226-column export not fully reconstructed; all 44 fields needed by the included analysis scripts are mapped.",
+    "Matching native analysis fields does not by itself prove which release produced the historical export.",
+    "Complete pipeline was rerun locally in the recorded environment, not independently in an external clean environment."
+  ],
+  "verification": {
+    "syntax_checked": true,
+    "absolute_machine_paths_removed": true,
+    "independent_clean_rerun": false,
+    "complete_native_pipeline_rerun": true,
+    "deterministic_MI_seed_fix": true,
+    "portable_figure_generation_executed": true,
+    "seven_figures_visually_reviewed": true
+  },
+  "source_preparation": {
+    "native_source": "PhysioNet heart-failure-zigong version 1.2 dat.csv",
+    "source_to_minimal_coded_fields": 44,
+    "entrypoint": "prepare_physionet.py or run_all.py --physionet",
+    "native_dat_sha256": "f2be23eeaf2e6f457512ad7653f6ce98a87ac23376596eef6d3bf46e4f311ae8",
+    "exact_MI_predictor_match_to_historical_extract": true,
+    "float_read_mode": "round_trip for derived TSV; preserves initial native parsing"
+  },
+  "MI_seed_correction": "statsmodels 0.15 MICEData rng=None does not use numpy.random.seed; canonical candidate passes explicit seeded numpy Generator and replaces the historical unseeded MI outputs.",
+  "updated": "2026-09-23",
+  "figure_reproduction": {
+    "entrypoint": "plot_public_figures.py",
+    "figures": 7,
+    "statistical_models_refitted": false,
+    "private_inputs_in_package": false,
+    "data_and_metrics_reproduced": true,
+    "pixel_identity_claimed": false
+  },
+  "code_licence_status": "No code reuse licence is included in this supplied package. Repository licence must be confirmed; source-data licence is separate."
+}
